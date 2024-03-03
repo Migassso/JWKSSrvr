@@ -6,13 +6,15 @@ import base64
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
+
 app = Flask(__name__)
+#these create the addresses
 @app.route("/.well-known/jwks.json", methods=["GET"])
 def jwks():
     non_expired_keys = []
     for kid, key_info in keysStorage.items():
         if key_info["Expiry"] > datetime.now():
-            # Deserialize the PEM-encoded public key
+            # Deserialize the PEM-encoded  key
             public_key = serialization.load_pem_public_key(
                 key_info["Public Key"],
                 backend=default_backend()
@@ -31,6 +33,7 @@ def jwks():
                 }
                 non_expired_keys.append(jwk)   
     return jsonify({"keys": non_expired_keys})
+
 @app.route("/auth", methods=["POST"])
 def auth():
     use_expired_key = "expired" in request.args

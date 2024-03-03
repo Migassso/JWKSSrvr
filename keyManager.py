@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timedelta
 keysStorage = {}
 def generate_rsa_key_pair():
-    privateKey = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
+    privateKey = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     expires = datetime.now() + timedelta(days=365)
     publicKey = privateKey.public_key()
     kid = str(uuid.uuid4())
