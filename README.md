@@ -17,4 +17,3 @@ Runs 3 tests on server to check operation.
 
 
 
-~Migasso: Programming like Picasso~
