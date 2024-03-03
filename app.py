@@ -34,15 +34,23 @@ def jwks():
 @app.route("/auth", methods=["POST"])
 def auth():
     use_expired_key = "expired" in request.args
+    current_time = datetime.now()
+    
     for kid, key_info in keysStorage.items():
-        if (use_expired_key and key_info["Expiry"] <= datetime.now()) or (not use_expired_key and key_info["Expiry"] > datetime.now()):
+        expiry = key_info["Expiry"]
+        
+        # Check if the key is expired or not based on the use_expired_key flag
+        if (use_expired_key and expiry <= current_time) or (not use_expired_key and expiry > current_time):
             private_key = key_info["Private Key"]
             payload = {
                 "iss": "~~~migasso~~~",
-                "exp": datetime.utcnow() + timedelta(minutes=5),  # 5 minutes expiration
+                "exp": current_time + timedelta(minutes=5),  # 5 minutes expiration
             }
             token = jwt.encode(payload, private_key, algorithm="RS256", headers={"kid": kid})
             return jsonify({"token": token})
+
+    # No suitable key found
     return jsonify({"error": "No suitable key found"}), 400
+
 if __name__ == "__main__":
     app.run(port=8080)
